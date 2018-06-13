@@ -1,0 +1,26 @@
+version: '2'
+services:
+  ui:
+    image: deploy_ui:latest
+    env_file:
+      - ./config/ui/env
+    restart: always
+    volumes:
+      - ./config/ui/app.conf:/etc/ui/app.conf
+      - ./config/ui/private_key.pem:/etc/ui/private_key.pem
+      - /data/image-log:/var/log/image-log #The vulnerability log path
+      - /data/image-num:/var/log/image-num #The image size store path
+    logging:
+      driver: "json-file"
+  jobservice:
+    image: deploy_jobservice:latest
+    env_file:
+      - ./config/jobservice/env
+    restart: always
+    volumes:
+      - /data/job_logs:/var/log/jobs
+      - ./config/jobservice/app.conf:/etc/jobservice/app.conf
+    depends_on:
+      - ui
+    logging:
+      driver: "json-file"
